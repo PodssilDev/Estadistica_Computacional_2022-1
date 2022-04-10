@@ -1,0 +1,218 @@
+---
+title: "**Ejercicios 1 - Estadistica Computacional (13311)**"
+author: "**John Serrano C.**"
+date: "**`r Sys.Date()`**"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **DESAFIO 1**
+### *"Realice otros 10 ejemplos con diferentes operadores matemáticos."*
+
+Tal como dice el enunciado, solo debemos realizar ejemplos de diferentes operadores matemáticos. Considerando esto, tendremos ejemplos utilizando otros operadores matemáticos, como son: resta, raiz cubica, factorial, logaritmo base 2, coseno, tangente 
+
+```{r ej1}
+# Ejemplo 1: Resta 
+v1 = 100
+v2 = -100
+v3 = v1 - v2
+print(v3)
+```
+
+```{r ej2}
+# Ejemplo 2: Raiz cubica
+v1 = 64^(1/3)
+print(v1)
+```
+
+```{r ej3}
+# Ejemplo 3: Factorial
+v1 = factorial(8)
+print(v1)
+```
+
+```{r ej4}
+# Ejemplo 4: Logaritmo base 2
+v1 = log2(64)
+print(v1)
+```
+
+```{r ej5}
+# Ejemplo 5: Coseno
+v1 = cos(90)
+print(v1)
+```
+
+```{r ej6}
+# Ejemplo 6: Tangente
+v1 = tan(360)
+print(v1)
+```
+
+```{r ej7}
+# Ejemplo 7: Arcotangente
+v1 = atan(360)
+print(v1)
+```
+
+```{r ej8}
+# Ejemplo 8: Arcoseno
+v1 = asin(1)
+print(v1)
+```
+
+```{r ej9}
+# Ejemplo 9: Potencia
+v1 = 2^3
+print(v1)
+```
+
+```{r ej10}
+# Ejemplo 10: Division entera
+v1 = 50 %% 30
+print(v1)
+```
+
+## **DESAFIO 2**
+### *"Realice ejemplos usando otros tipos de estructura de datos: elementos booleanos, factores, tablas, entre otros."*
+
+Para el primer ejemplo, utilizaremos la libreria "igraph" para crear un grafo de 5 nodos.
+
+```{r}
+library(igraph)
+g = make_empty_graph(5)
+plot(g)
+```
+
+Para el segundo ejemplo, creamos un vector de direcciones y luego utilizamos la funcion "factor" para crear un factor del vector de direcciones
+
+```{r}
+# Creamos un vector de direcciones
+direcciones = c("Norte", "Norte", "Este", "Sur", "Oeste")
+# Se crea un factor del vector direcciones
+factor_direcciones = factor(direcciones)
+factor_direcciones
+```
+
+Para el tercer ejemplo, usaremos la librery knitr junto con las funciones kable y table para formar una tabla, utilizando dos vectores
+
+```{r}
+library(knitr)
+vect1 = c(1,2,3,4,5,6,7,8,9,10)
+vect2 = c(1,2,3,4,5,6,7,8,9,10)
+kable(table(vect1,vect2))
+```
+
+## **DESAFIO 3**
+### *"Construya una función que permita a un jugador jugar al piedra papel o tijeras."*
+
+Considerando que estamos utilizando R Markdown, la entrada será colocada en bruto, pero se señalará con un comentario cual es para que se pueda cambiar si asi se desea.
+```{r}
+entrada = "tijeras" # CAMBIE ESTA VARIABLE SI DESEA PROBAR OTRA ENTRADA
+
+# Entrada: Un string correspondiente a "piedra", "papel" o "tijeras"
+# Salida: Un string diciendo si se gano, perdio o empato la partida
+# Descripcion: Un simple juego de piedra, papel o tijeras contra la computadora.
+piedra_papel_tijeras = function(entrada){
+  opciones_validas = c("piedra", "papel", "tijeras")
+  if(entrada %in% opciones_validas){
+    opcion = sample(1:3,1)
+    enemigo = opciones_validas[opcion]
+    if(enemigo == "piedra"){
+      if(entrada == "piedra"){
+        print("Usted eligio: piedra")
+        print("La computadora eligio: piedra")
+        return("Resultado: Empate!")
+      }
+      if(entrada == "papel"){
+        print("Usted eligio: papel")
+        print("La computadora eligio: piedra")
+        return("Resultado: Usted gana la partida!")
+      }
+      if(entrada == "tijeras"){
+        print("Usted eligio: tijeras")
+        print("La computadora eligio: piedra")
+        return("Resultado: Usted pierde la partida!")
+      }
+    }
+    if(enemigo == "papel"){
+      if(entrada == "piedra"){
+        print("Usted eligio: piedra")
+        print("La computadora eligio: papel")
+        return("Resultado: Usted pierde la partida!")
+      }
+      if(entrada == "papel"){
+        print("Usted eligio: papel")
+        print("La computadora eligio: papel")
+        return("Resultado: Empate!")
+      }
+      if(entrada == "tijeras"){
+        print("Usted eligio: tijeras")
+        print("La computadora eligio: papel")
+        return("Resultado: Usted gana la partida!")
+      }
+    }
+    if(enemigo == "tijeras"){
+      if(entrada == "piedra"){
+        print("Usted eligio: piedra")
+        print("La computadora eligio: tijeras")
+        return("Resultado: Usted gana la partida!")
+      }
+      if(entrada == "papel"){
+        print("Usted eligio: papel")
+        print("La computadora eligio: tijeras")
+        return("Resultado: Usted pierde la partida!")
+      }
+      if(entrada == "tijeras"){
+        print("Usted eligio: tijeras")
+        print("La computadora eligio: tijeras")
+        return("Resultado: Empate!")
+      }
+    }
+  }
+  else{
+    return("Opcion invalida, intentelo nuevamente.")
+  }
+}
+# LLamado a la función
+piedra_papel_tijeras(entrada)
+```
+
+## **DESAFIO 4**
+### *1.- Seleccione un conjunto de datos desde el paquete ‘datasets’ de R. Para ver los datasets disponibles en la consola puede utilizar la función “data()” o puede consultarlos en la página web https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html. Una vez seleccionado puede utilizar la función data(‘nombre_del_dataset’) para cargar el dataset.*
+Cargando los datos con data(), vamos a elegir el dataset "UCBAdmissions". Vamos a utilizar force() para poder ver el contenido del dataset.
+```{r}
+data("UCBAdmissions")
+force(UCBAdmissions)
+```
+### *2.- Describa el conjunto de datos y explique para que fue o podría ser utilizado. Puede usar la función help(‘nombre_del_dataset’). ¿Cuál es la fuente de los datos?*
+El conjunto de datos trata sobre los postulantes a UC Berkeley, donde se da a conocer información sobre los postulantes para los seis grandes departamentos de Berkeley y cuya información proviene del año 1973.  Contiene tres variables, la primera informa de si una persona fue aceptada o no, la segunda dice su genero y la tercera dice al departamento al que fue aceptado.
+
+Si utilizamos la funcion help("UCBAdmissions") podemos encontrar mas información sobre el data set,  donde también se da a conocer el detalle de que el dataset se utiliza frecuentemente para ilustrar la parajona de Simpson, el cual es un fenomeno en probablidad y estadistica que ilustra una asociación entre dos variables en una población que surge, desaparece o se invierte cuando la población se divide en subpoblaciones.
+
+### *3.- Describa cada variable, indique a qué tipo de variable corresponde, indique qué valores puede tomar y su unidad de medida.*
+
+a) La primera variable corresponde al estado de si la postulación del individuo fue aceptada o no. Puede tomar dos estados, aceptado o rechazado. Es una variable del tipo **"cualitativa  dicotómica"**, ya que solo puede tomar dos estados. 
+
+b) La segunda variable corresponde al sexo del individuo, e indique si es hombre o mujer. Es una variable del tipo **"cualitativa nominal"**
+
+c) La tercera variable es el departamento al que el individuo es aceptado, donde hay seis opciones: A,B,C,D,E,F. Es una variable del tipo **"cualitativa nominal"** ya que corrresponde a una clasificación similar a una nacionalidad.
+
+Para el caso de las tres variables, no tienen una unidad de medida definida.
+
+### *4.-Ejecute la función summary(“conjunto_de_datos”). ¿Qué puede observar?*
+```{r}
+data("UCBAdmissions")
+summary(UCBAdmissions)
+```
+Al aplicar la función, se puede observar información sobre los datos, como por ejemplo, el numero de datos que hay en total, el numero de factores que contiene el data set y otras informaciones como el chi-square, el cual es un método estadístico que evalúa la bondad de ajuste entre los valores observados y los esperados teóricamente, junto con otras informaciones más.
+
+### *5.- Ejecute la función plot(“conjunto_de_datos”). ¿Qué puede observar?*
+```{r}
+plot(UCBAdmissions)
+```
+
+Al aplicar la función, se puede observar cuatro graficas, donde en las cuatro se tienen seis barras. Estos graficos estan relacionados con el data set y estan clasificados por generos y por estado de admision. Las seis barras representan a los departamentos.
