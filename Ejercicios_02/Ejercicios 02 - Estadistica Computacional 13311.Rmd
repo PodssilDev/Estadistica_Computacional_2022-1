@@ -1,0 +1,199 @@
+---
+title: "**Ejercicios 02 - Estadistica Computacional 13311**"
+author: "**John Serrano C.**"
+date: "**`r Sys.Date()`**"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### **1. Instale el paquete “gtools” con la sentencia: install.packages(′gtools′ ), incluya la librería “gtools” (library(gtools)).**
+
+```{r}
+# install.packages('gtools')
+library(gtools)
+```
+
+### **2. Explique brevemente la diferencia entre permutación y combinación**
+
+**Permutación**: La permutación es una agrupación de elemenentos donde si importa el orden con el que se ordenen los elementos
+
+**Combinación**: La combinación es una agrupación con todos los elementos, donde no importa el orden con el que se ordenen los elementos
+
+### **3 Busque en la ayuda de R las funciones combinations y permutations y explique brevemente como funcionan**
+
+***combinations***: Esta función recibe un vector y enumera todas las posibles combinaciones de un tamaño en especifico considerando los elementos que contiene el vector de entrada. Retorna una matriz
+
+***permutations***: Esta función al igual que combinations recibe un vector, pero solo enumera todas las posibles permutaciones considerando los elementos del vector. Retorna una matriz.
+
+### **4. Calcule:**
+
+### **a) La cantidad de  permutaciones posibles con n = 14 y r = 4 con y sin repetición
+
+Con repetición:
+```{r}
+# permutations(14,4,1:14,TRUE,TRUE)
+```
+
+Podemos utilizar la funcion nrow() para facilmente obtener la cantidad de permutaciones con repetición
+
+```{r}
+nrow(permutations(14,4,1:14,TRUE,TRUE))
+```
+
+Sin repetición:
+
+```{r}
+# permutations(14,4,1:14,TRUE,FALSE)
+```
+
+Podemos utilizar la funcion nrow() para facilmente obtener la cantidad de permutaciones sin repetición
+```{r}
+nrow(permutations(14,4,1:14,TRUE, FALSE))
+```
+
+**Por lo tanto, la cantidad de permutaciones con repetición es 38416 y sin repeticion es 24024, considerando n = 14 y r = 4.**
+
+### **b) Las combinaciones de largo tres con las letras a, b, c con y sin repetición**
+
+Con repeticion:
+
+```{r}
+combinations(3, 3, c("a", "b", "c"), TRUE, TRUE)
+```
+
+Sin repetición:
+
+```{r}
+combinations(3,3,c("a","b","c"), TRUE, FALSE)
+```
+
+### **c) La cantidad de permutaciones y combinaciones con n = 30 y r = 2 sin repetición**
+
+Permutaciones:
+
+```{r}
+# permutations(30,2,1:30,TRUE,FALSE)
+nrow(permutations(30,2,1:30,TRUE,FALSE))
+```
+
+Combinaciones:
+
+```{r}
+# combinations(30,2,1:30,TRUE,FALSE)
+nrow(combinations(30,2,1:30,TRUE,FALSE))
+```
+
+### **5 Utilizando el conjunto de datos Titanic:**
+
+```{r}
+data("Titanic")
+force(Titanic)
+```
+
+
+### **a) Cree una funcion que calcule la probabilidad de A, dado B.**
+
+```{r}
+# Entrada: Tres probabilidades, la de B dado A, la de A y la de B
+# Salida: La probabilidad de A dado B
+# Descripcion: Funcion que calcula la probabilidad de A, dado B (Teorema de Bayes)
+bayes = function(PBA, PA, PB){
+  return((PBA * PA)/ PB)
+}
+```
+
+### **b) Responda las siguientes preguntas:**
+### **1) ¿Cuál es el porcentaje de supervivencia de los pasajeros y de la tripulación?¿Cuál es mayor?**
+
+Pasajeros:
+```{r}
+pasajeros_sobrevivientes = apply(Titanic, c(1,4),sum)[5] + apply(Titanic, c(1,4),sum)[6] + apply(Titanic, c(1,4),sum)[7]
+total_pasajeros = apply(Titanic, 1, sum)[1]+ apply(Titanic, 1, sum)[2] + apply(Titanic, 1, sum)[3]
+supervivencia = pasajeros_sobrevivientes / total_pasajeros
+supervivencia = supervivencia * 100
+supervivencia
+
+```
+
+Tripulación:
+```{r}
+crew_sobrevivientes = apply(Titanic, c(1,4), sum)[8]
+total_crew = apply(Titanic,1, sum)[4]
+supervivencia = crew_sobrevivientes / total_crew
+supervivencia = supervivencia * 100
+supervivencia
+
+```
+
+**Considerando lo anterior, el porcentaje de supervivencia de los pasajeros es mayor que el de la tripulación**
+
+### **2)¿Cuál es la probabilidad de que una mujer de la tripulación sobreviva?**
+Teniendo en consideración:
+
+**P(B|A) La probabilidad de que sea mujer, tripultante y sobreviva**
+
+**P(A) La probabilidad de supervivencia**
+
+**P(B) La probabilidad de que sea mujer y de la tripilación**
+
+Utilizamos el teorema de Bayes para calcular la probabilidad:
+
+```{r}
+mujer_tripulante_sobreviva = (apply(Titanic, c(1,2,4), sum)[16]) / (apply(Titanic, 4, sum)[2])
+supervivencia = (apply(Titanic, 4, sum)[2]) / ((apply(Titanic,4,sum)[1]) + (apply(Titanic,4,sum)[2]))
+mujer_tripulante = (apply(Titanic, c(1,2),sum)[8]) /  (apply(Titanic,1,sum)[4])
+bayes(mujer_tripulante_sobreviva, supervivencia, mujer_tripulante)
+```
+
+### **3) ¿Cuál es la probabilidad de que un(a) menor de edad sobreviva en tercera clase?**
+
+```{r}
+menor_terclase_sobreviva = (apply(Titanic, c(1,3,4), sum)[11]) / (apply(Titanic, 4, sum)[2])
+supervivencia = (apply(Titanic, 4, sum)[2]) / ((apply(Titanic,4,sum)[1]) + (apply(Titanic,4,sum)[2]))
+menor_tercera = (apply(Titanic, c(1,3),sum)[3]) /  (apply(Titanic,1,sum)[3])
+bayes(menor_terclase_sobreviva, supervivencia, menor_tercera)
+```
+
+### **4) ¿En general se cumple el código “mujeres y niños(as) primero”?**
+
+```{r}
+ninos_supervivientes = apply(Titanic, c(3,4),sum)[3]
+ninos_totales = apply(Titanic,3,sum)[1]
+ninos = ninos_supervivientes / ninos_totales
+
+mujeres_supervivientes = apply(Titanic,c(2,3,4),sum)[8]
+mujeres_totales = apply(Titanic,c(2,3),sum)[4]
+mujeres = mujeres_supervivientes / mujeres_totales
+
+ninos
+mujeres
+```
+**Considerando las probabilidades anteriores, si se cumple el código de las mujeres y ninos primero**
+
+### **5) Seleccione una clase de forma aleatoria, puede utilizar la función sample. ¿En la clase seleccionada se cumple el código “mujeres y niños(as) primero”?**
+
+```{r}
+set.seed(98)
+sample(apply(Titanic,1,sum),1)
+mujeres_sobrevivientes = apply(Titanic,c(1,2,3,4),sum)[30]
+total_mujeres = apply(Titanic,c(1,2,3),sum)[14]
+mujeres = mujeres_sobrevivientes / total_mujeres
+
+
+ninos_sobrevivientes = apply(Titanic,c(1,3,4),sum)[10]
+total_ninos = apply(Titanic,c(1,3),sum)[2]
+ninos = ninos_sobrevivientes / total_ninos
+
+hombres_sobrevivientes = apply(Titanic,c(1,2,3,4),sum)[26]
+total_hombres = apply(Titanic,c(1,2,3),sum)[10]
+hombres = hombres_sobrevivientes / total_hombres
+
+mujeres
+ninos
+hombres
+```
+
+**Considerando las probabilidades anteriores obtenidas, si se cumple el código de mujeres y ninos primero**
