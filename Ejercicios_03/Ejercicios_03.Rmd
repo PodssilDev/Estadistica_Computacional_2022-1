@@ -1,0 +1,209 @@
+---
+title: "**Ejercicios 03 - Estadistica Computacional 13311**"
+author: "**John Serrano C.**"
+date: "**`r Sys.Date()`**"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## **Problema 1: En el proceso de fabricación de teléfonos, tres de ellos son seleccionados aleatoriamente por trabajadores para evaluar su calidad. Cada pieza es categorizada como “funcional” o “con falla” según los resultados de su evaluación. Si la probabilidad de que un teléfono no tenga fallas es 0.8, siendo la evaluación independiente entre equipos.**
+
+### **a) Señale el tipo de variable aleatoria y la distribución que sigue.**
+
+Corresponde a una Variable numerica de tipo discreta, con una distribución binomial.
+
+### **b) Determine la función de probabilidad de masa.**
+Considerando la distribución binomial, podemos hacer un cálculo de las probabilidades, para obtener la función de probabilidad de masa, con x siendo la cantidad de exitos y n = 3, podemos obtener las probabilidades con x = {0,1,2,3}.
+
+![Formula Binomial](/Users/mrdoo/Downloads/binomial.jpeg)
+
+```{r}
+telefonos = function(x){
+  factorial(3)/(factorial(x)*factorial(3-x)) * 0.8^x * (1-0.8)^(3-x)
+}
+telefonos(0)
+telefonos(1)
+telefonos(2)
+telefonos(3)
+```
+Lo cual notemos que al sumar las probabilidades, obtenemos 1, lo cual cumple con las condiciones de la distribución binomial. Cualquier otro X da como probabilidad 0.
+Por lo tanto, la función de masa quedaria de la siguiente forma:
+
+```{r}
+x = c(0,1,2,3)
+probabilidades = c(telefonos(0), telefonos(1), telefonos(2), telefonos(3))
+datos = data.frame(x,probabilidades)
+datos
+```
+
+### **c) Grafique la distribución**
+
+```{r}
+library("ggplot2")
+grafico = ggplot(data = datos, aes(x = x, y = probabilidades))
+grafico = grafico + geom_bar(stat = "identity", fill = "lightblue3")
+grafico = grafico + theme_bw() + ggtitle("Distribución de probabilidades, de tipo binomial")
+grafico = grafico + xlab("Exitos") + ylab("Probabilidades")
+plot(grafico)
+```
+
+## **Problema 2:  En un estudio clínico los voluntarios son examinados para encontrar un gen asociado a la aparición de cáncer. La probabilidad de que una persona tenga el gen es 0.1. Si se asume que la evaluación de una persona es independiente de otra:**
+
+### **a) Señale el tipo de variable aleatoria y la distribución que sigue.**
+
+Corresponde a una variable numerica, de tipo discreta, con una distribución binomial negativa.
+
+### **b) ¿Cuál es la probabilidad de que cuatro o más evaluaciones deban ser efectuadas para detectar a dos personas portadoras del gen?**
+
+Considerando la formula de distribución binomail negativa, con r = 2:
+
+![Formula binomial negativa](/Users/mrdoo/Downloads/binomialneg.jpeg)
+
+```{r, include = FALSE}
+library("Rlab")
+```
+
+```{r}
+# Utilizando pnbinom, podemos rapidamente calcular la distribucion
+distribucion = (1-pnbinom(1,2,0.1)) 
+distribucion
+```
+
+### **c) ¿Cuál es el número esperado de evaluaciones que debo realizar para detectar dos personas portadoras del gen?**
+
+En palabras simples, nos estan pidiendo la esperanza de la distribución binomial negativa, lo cual equivale a r/p, con r = 2 y p = 0.1
+
+```{r}
+esperanza = 2 / 0.1
+esperanza
+```
+
+### **d) Grafique la distribución.**
+
+Considerando 10 personas:
+```{r}
+personas = seq(0,10)
+distribucion = dnbinom(personas, 2, prob=0.1)
+datos=data.frame(personas,distribucion)
+
+grafico = ggplot(data=datos,aes(x=personas,y=distribucion))
+grafico = grafico + geom_bar(stat="identity",fill="lightblue3")
+grafico = grafico + theme_bw() + ggtitle("Distribución binomial negativa")
+grafico = grafico + xlab("Personas") + ylab("Probabilidades")
+plot(grafico)
+```
+
+## **Problema 3: Una empresa contrata a 800 hombres menores de 55 años. Suponga que el 30 % tiene un marcador en el cromosoma masculino que indica un mayor riesgo de cáncer de próstata**
+
+### **a) Señale el tipo de variable aleatoria y la distribución que sigue.**
+
+Corresponde a una variable numerica, de tipo discreta, con una distribución Hipergeométrica
+
+### **b) Si a 10 hombres de la empresa se les hace la prueba del marcador en este cromosoma, ¿cuál es la probabilidad de que exactamente 1 hombre tenga el marcador?**
+
+Considerando que el 30% de los que tienen marcadir en el cromosoma masculino corresponden a 240 hombres, y que los hombres sanos son 560, podemos aplicar dhyper para rapidamente encontrar la distribución, considerando la formula de la distribución Hipergeométrica
+![Distribucion Hipergeométrica](/Users/mrdoo/Downloads/hyper.jpeg)
+
+```{r}
+distribucion = dhyper(x = 1, m = 240, k = 10, n = 560)
+distribucion
+```
+
+### **c)  Si a 10 hombres de la empresa se les hace la prueba del marcador en este cromosoma, ¿cuál es la probabilidad de que más de 1 tenga el marcador?**
+Considerando que ahora se pide que mas de 1 tenga el marcador, buscamos p(x>1), es decir, 1 - p(x<1).
+
+```{r}
+distribucion = 1 - (dhyper(x = 1, m = 240, k = 10, n = 560)) - (dhyper(x = 0, m = 240, k = 10, n = 560))
+distribucion
+```
+
+### **d) Grafique la distribución**
+
+```{r}
+personas = seq(0,10)
+distribucion = dhyper(x = personas, m = 240, k =10, n = 560)
+datos=data.frame(personas,distribucion)
+
+grafico = ggplot(data=datos,aes(x=personas,y=distribucion))
+grafico = grafico + geom_bar(stat="identity",fill="lightblue3")
+grafico = grafico + theme_bw() + ggtitle("Distribución Hypergeometrica")
+grafico = grafico + xlab("Personas") + ylab("Probabilidades")
+plot(grafico)
+```
+
+## **Problema 4:  El número de llamadas telefónicas que llegan a una central telefónica se modela como una variable aleatoria de Poisson. Suponga que en promedio hay 8 llamadas por hora.**
+
+### **a) Señale el tipo de variable aleatoria y la distribución que sigue.**
+
+Corresponde a una variable numerica, de tipo discreta, con una distribución de Poisson.
+
+### **b) ¿Cuál es la probabilidad de que haya exactamente cinco llamadas en una hora?**
+
+Considerando k = 5 y lambda = 8, podemos usar la función dpois() para facilmente calcular la distribución, considerando la formula de la distribución de Poisson:
+
+![Distribución de Poisson](/Users/mrdoo/Downloads/poisson.jpeg)
+
+```{r}
+distribucion = dpois(5,8)
+distribucion
+```
+
+### **c) ¿Cuál es la probabilidad de que haya tres llamadas o menos en una hora?**
+Considerando ahora que k pertenecerá al intervalo [0,3], nuevamente podemos utilizar dpois()
+```{r}
+distribucion = dpois(0,8) + dpois(1,8) + dpois(2,8) + dpois(3,8)
+distribucion
+```
+
+## **Problema 5: Un artículo en Knee Surgery Sports Traumatology, Arthroscopy [“Effect of Provider Volume on Resource Utilization for Surgical Procedures” (2005, Vol. 13, pp. 273–279)] mostró un tiempo medio de 129 minutos y una desviación estándar de 14 minutos para cirugía de reconstrucción de LCA para hospitales de alto volumen (con más de 300 cirugías de este tipo por año). Si un hospital de alto volumen necesita programar 10 cirugías, ¿cuáles son la media y la varianza del tiempo total para completar estas cirugías? Suponga que los tiempos de las cirugías son independientes y normalmente distribuidos**
+
+Considerando que el tiempo medio es de 129 minutos, la **media** con 10 cirugias seria 129 * 10, lo cual equivale a **1290 minutos.**
+Para el caso de la **varianza**, tendriamos 100 * (14 * 14), lo cual es equivalente a **19600 minutos**
+
+## **Problema 6: Aborde los ejercicios 1 y 4 efectuando una aproximación mediante una distribución normal. ¿Qué puede concluir?**
+
+### **Ejercicio 01:**
+Debemos primero obtener la media y la desviacion, considerando los datos dados por el ejercicio 1
+
+```{r}
+media = 0.8 * 3
+desviacion = sqrt((0.8 * 0.2 * 3))
+distribucion = pnorm((3.5 - media) / desviacion)
+distribucion
+```
+
+Podemos calcular la inexactitud de la aproximación
+
+```{r}
+n = 3
+p = 0.8
+np = n*p
+np
+n*(1-p)
+```
+Debido a que los valores son menores a 5, se concluye que no es una buena aproximación.
+
+### **Ejercicio 04:**
+### **Parte A:**
+
+```{r}
+x = (5-8) / sqrt(8)
+distribucion = pnorm(x,0,1)
+distribucion
+```
+
+### ***Parte B:**
+```{r}
+x3 = (3-8) / sqrt(8)
+x2 = (2-8) / sqrt(8)
+x1 = (1-8) / sqrt(8)
+x0 = (0-8) / sqrt(8)
+distribucion = pnorm(x0,0,1) + pnorm(x1,0,1) + pnorm(x2,0,1) + pnorm(x3,0,1)
+distribucion
+
+```
+Como lambda es mayor a 5, se concluye que ambas aproximaciones no son buenas.
