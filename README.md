@@ -4,6 +4,7 @@ Repositorio de los ejercicios realizados en R para el curso de Estadística Comp
 ## Descripción
 * Ejercicios 01: Introducción a la Estadística Computacional
 * Ejercicios 02: Introducción a las Probabilidades
+* Ejercicios 03: Distribuciones de Probabilidad
 
 ## Prerrequisitos
 Se necesita del programa [R](https://cran.r-project.org/bin/windows/base/) junto con [R Studio](https://www.rstudio.com/products/rstudio/download/) para poder visualizar los codigos y el RMarkdown de los distintos proyectos.
