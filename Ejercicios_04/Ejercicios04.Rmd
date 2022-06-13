@@ -1,0 +1,136 @@
+---
+title: "**Estadistica Computacional - Ejercicios 04**"
+author: "**John Serrano C.**"
+date: "**`r Sys.Date()`**"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### **Para el desarrollo de esta sesión de ejercicios, vamos a utilizar el dataSet "Iris" disponible en https://archive.ics.uci.edu/ml/datasets/Iris . Para facilitar el proceso de trabajo, lo trabajaremos como data frame.**
+
+```{r, include = FALSE}
+# Se cargan las librerias a utilizar
+library("BHH2")
+library(plotly)
+library("ggplot2")
+```
+
+```{r}
+# Se crea el dataframe
+data = data.frame(iris)
+data
+```
+
+### **Con el dataset ya creado, procedemos a la construcción de la tabla de frecuencias respecto a la variable cualitativa "Especie".**
+
+```{r}
+#Tabla de frecuencia variables cualitativas
+#Frecuencia
+fi=-as.numeric(sort(-table(data$Species))) #Frecuencia absoluta
+fac=cumsum(fi)                           #Frecuencia acumulada
+fri=as.numeric(fi/sum(fi))*100           #Frecuencia relativa
+frac=cumsum(fri)                         #Frecuencia relativa acumulada
+especie=c("SETOSA", "VERSICOLOR", "VIRGINICA")
+  #Tabla
+frecuencias_esp= data.frame(especie,fi,fac,fri=round(fri,2),frac=round(frac,2))
+  #Visualización
+knitr::kable(frecuencias_esp)
+```
+
+### **Repetimos el mismo proceso pero esta vez, utilizando la variable cuantitativa "Largo del petalo".**
+
+```{r}
+#Tabla de frecuencia variables cuantitativas
+  #Frecuencia
+fi=as.numeric(table(data$Petal.Length))  #Frecuencia absoluta
+fac=cumsum(fi)                    #Frecuencia acumulada
+fri=as.numeric(fi/sum(fi))*100    #Frecuencia relativa
+frac=cumsum(fri)                  #Frecuencia relativa acumulada
+  #Tabla
+petal.length=sort(unique(data$Petal.Length))
+frecuencias_largo = data.frame(petal.length,fi,fac,fri=round(fri,2),frac=round(frac,2))
+  #Visualización
+knitr::kable(head(frecuencias_largo,50))
+```
+
+### **Lo anterior sale mas facil verlo agrupandolo en intervalos**
+```{r}
+#Tabla de frecuencia variables cuantitativas
+  #Frecuencia
+n = length(petal.length)                    # Número de elementos de edad
+k = round(1 + 3.3 * log(n))         # Aplicamos regla de Sturges
+h = round((max(petal.length)-min(petal.length))/k)  # Cálculo de intervalo
+
+ #Crear intervalos
+intervalos=hist(data$Petal.Length, plot=FALSE, breaks = k)$breaks
+intervalos=paste("(",intervalos[1:(length(intervalos)-1)],"-",intervalos[2:(length(intervalos))],"]",sep="")
+intervalos[1]="[1.0-1.5]"
+
+ #Cálculo de frecuencia
+fi = hist(data$Petal.Length, plot=FALSE, breaks = k)$counts      #Frecuencia con intervalos
+fac=cumsum(fi)                                            #Frecuencia acumulada
+fri=as.numeric(fi/sum(fi))*100                            #Frecuencia relativa
+frac=cumsum(fri)                                          #Frecuencia relativa acumulada  
+
+frecuencia_largo =data.frame(petal.length=intervalos,fi,fac,fri=round(fri,2),frac=round(frac,2))
+knitr::kable(frecuencia_largo)
+```
+
+### **Considerando las tablas de frecuencias obtenidas, se pueden armar gráficos que representan la información de las tablas**
+
+### **Graficos para la variable cualitativa "Especie"**
+
+```{r}
+# Gráfico de barras
+p=ggplot(data=frecuencias_esp, aes(x=reorder(especie, -fri),y=fi)) +
+  geom_bar(stat="identity",fill="maroon",alpha=0.8) + theme_minimal() + 
+  labs(title="Frecuencia absoluta - Especies", x="Especies", y = "Frecuencia absoluta")
+ggplotly(p)
+```
+
+```{r}
+# Grafico tipo pie
+p=ggplot(frecuencias_esp, aes(x="", y=fri, fill=reorder(especie, -fri))) +
+  geom_bar(stat="identity", width=1) + coord_polar("y", start=0) + theme_minimal() +
+  labs(title="Frecuencia relativa - Especie", x="Especie", y = "Frecuencia relativa (%)")
+p=p + scale_fill_brewer(palette="RdPu",name = "Tipo de Especie")
+plot(p)
+```
+
+```{r}
+# Gráfico de barras
+p=ggplot(data=frecuencias_esp, aes(x=reorder(especie, -fri),y=fi)) +
+  geom_bar(stat="identity",fill="maroon",alpha=0.8) + theme_minimal() + 
+  labs(title="Frecuencia absoluta y absoluta acumulada - Especies", x="Especies", y = "Frecuencia absoluta")
+p = p + geom_point(aes(y=fac))
+ggplotly(p)
+```
+
+### Graficos para la variable cuantitativa "Largo del petalo"**
+
+```{r}
+# Diagrama de puntos
+dotPlot(data$Petal.Length,xlab = "Largo del petalo (cm)")
+```
+
+```{r}
+# Histograma
+grafico=ggplot(data,aes(Petal.Length)) # Gráfico y datos base
+grafico = grafico + geom_histogram(bins=30,fill="maroon",color="maroon",alpha=0.8)
+grafico = grafico + theme_bw() # Visualización estándar en blanco y negro
+grafico = grafico + ylab("Frecuencia absoluta (Largo del petalo)") + xlab("Largo del petalo (cm)")
+grafico = grafico + ggtitle("Histograma")
+ggplotly(grafico)
+```
+
+## **PREGUNTAS:**
+## **1) ¿Qué ocurre al construir directamente una tabla de frecuencia?¿Qué conclusiones se pueden extraer?**
+
+Las tablas de frecuencias nos permiten saber la cantidad de veces que se repite una variable con un valor determinado, con el fin de generar una agrupación y ordenamiento de datos. Esto puede servir para estudios, investigaciones, etc, en palabras simples, es bastante util sobretodo cuando se tiene una gran cantidad de datos ya que permite trabajar en un conjunto de datos mas "acotado". Considerando que esto corresponde a la "Estadistica Descriptiva", las conclusiones no son conclusiones como tal, si no que pasan a ser hipótesis o estimaciones de lo que podria ser una conclusión. Esto es, porque es en la Estadistica Inferencial donde se obtienen las conclusiones.
+
+## **2) ¿Qué diferencia aprecia entre ambos tipos de representaciones?**
+
+Asumiendo que con "ambos tipos de representaciones" se refiere a las tablas de frecuencias y graficas de datos, se puede notar que los graficos permiten sacar una representación mas "simple" y visual sobre los datos, donde se pueden obtener estimaciones de otros datos no presentes en la grafica, sin embargo, se podrian considerar no muy precisos. Las tablas de frecuencias permiten obtener datos numericos mas facil y de esta forma también poder sacar otros datos relacionados, como el promedio, la variación de los datos, entre otras cosas.
+A fin de cuentas, ambas representaciones son útiles en el estudio de la Estadistica, pues se complementan entre si a pesar de tener diferencias.
