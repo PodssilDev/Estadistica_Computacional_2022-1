@@ -7,6 +7,7 @@ Repositorio de los ejercicios realizados en R para el curso de Estadística Comp
 * Ejercicios 03: Distribuciones de Probabilidad
 * Ejercicios 04: Análisis de frecuencia y representación gráfica
 * Ejercicios 05: Máxima Verosimilitud
+* Ejercicios 06: Pruebas de contraste de hipótesis para una sola muestra
 
 * [PEP 1: Unidad 1 - El rol de la estadística en ingeniería y Unidad 2 - Probabilidad, variables aleatorias y distribuciones de probabilidad](https://github.com/nic0q/PEP-1-Estadistica-Computacional.git)
 
