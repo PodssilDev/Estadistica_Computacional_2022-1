@@ -1,0 +1,357 @@
+---
+title: "**Ejercicios 06 - Estadistica Computacional (13311)**"
+author: "**John Serrano C.**"
+date: "**`r Sys.Date()`**"
+output: rmdformats::readthedown
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Parte I: Ejemplo de uso de la prueba z con una cola**
+*"Se desea contrastar con un nivel de significación del 5 % la hipótesis de
+que la talla media de los hombres de 18 o más años de un país es igual o
+mayor a 175. Suponiendo que la desviación típica de las tallas en la población
+vale 4, contraste dicha hipótesis frente a la alternativa de que es menor, con
+una muestra de n=15 hombres seleccionados al azar, con una media muestral de 173.47."*
+
+### **a) Graficando la distribución de probabildad y declaración de hipótesis: **
+```{r}
+# Grafico
+library("ggplot2")
+grafico_densidad = ggplot(data = data.frame(x = c(170, 180)), aes(x)) +
+  stat_function(fun = dnorm, n = 15, args = list(mean =175, sd = 4)) + ylab("") +
+  scale_y_continuous(breaks = NULL) + xlab("Tallas") + ylab("Densidad") + ggtitle("Función de densidad (distribución normal)") + theme_bw() +
+  geom_vline(xintercept = 173.47,cex=1.2,colour ="darkred",linetype="longdash") + geom_text(aes(x=173, label="xbar", y=0.0), colour ="darkred",size=5) + geom_vline(xintercept = 175,cex=1.2,colour ="coral3",linetype="longdash") + geom_text(aes(x=176, label="mu", y=0.00001), colour ="coral3",size=5)  
+
+grafico_densidad
+
+```
+
+* **La hipótesis nula es: ** $$H_0: \mu \geq 175$$
+* **La hipótesis alternativa es:** $$H_A: \mu < 175$$
+
+### **b) Calculo de z: **
+```{r}
+# Datos
+n = 15
+mu = 175
+x_bar = 173.47
+sigma = 4
+z = (x_bar-mu)/(sigma/sqrt(n))
+
+#Confianza
+alfa = 0.05 # Nivel de significancia
+confianza = 1-alfa
+z_alfa = qnorm(alfa)
+z
+z_alfa
+
+```
+
+### **c) Grafica de lo obtenido y respuesta final:**
+```{r}
+# Grafico
+dnorm_limit <- function(x) {
+    y <- dnorm(x)
+    y[x < z_alfa  |  x > -z_alfa] <- NA
+    return(y)
+}
+
+# ggplot()
+grafico_densidad = ggplot(data.frame(x = c(-3, 3)), aes(x = x)) + 
+  stat_function(fun = dnorm_limit, geom = "area", fill = "blue", alpha = 0.2) +  stat_function(fun = dnorm) +
+  xlab("Tallas") + ylab("Densidad") + ggtitle("Función de densidad") + 
+  theme_bw() + geom_vline(xintercept = (x_bar-mu)/(sigma/sqrt(n)),cex=1.2,colour ="darkred") + 
+  geom_text(aes(x=(x_bar-mu)/(sigma/sqrt(n))+0.2, label="z", y=0.0), colour ="darkred",size=10)
+
+plot(grafico_densidad)
+
+```
+
+**Por lo tanto, como el valor obtenido esta dentro de la zona de aceptación, la Hipótesis Nula se acepta.**
+$$\mu \geq 175$$
+
+## **Parte II: Ejemplo de uso de la prueba t con una cola**
+
+*"Se desea contrastar con un nivel de significación del 5 % la hipótesis de
+que la talla media de los hombres de 18 o más años de un país es igual o
+mayor a 168. Suponiendo que la desviación de la muestra vale 7.36, contraste 
+dicha hipótesis frente a la alternativa de que es menor, con
+una muestra de n=15 hombres seleccionados al azar, con una media muestral de 173.47."*
+
+### **a) Graficando la distribución de probabildad y declaración de hipótesis: **
+```{r}
+# Grafico
+grafico_densidad = ggplot(data = data.frame(x = c(130, 215)), aes(x)) +
+  stat_function(fun = dt, n = 15, args = list(x =168, df = 14)) + ylab("") +
+  scale_y_continuous(breaks = NULL) + xlab("Tallas") + ylab("Densidad") + ggtitle("Función de densidad (Distribución t)") + theme_bw() +
+  geom_vline(xintercept = 173.47,cex=1.2,colour ="darkred",linetype="longdash") + geom_text(aes(x=178, label="xbar", y=0.0), colour ="darkred",size=5) + geom_vline(xintercept = 168,cex=1.2,colour ="coral3",linetype="longdash") + geom_text(aes(x=171, label="mu", y=0.001), colour ="coral3",size=5)  
+
+grafico_densidad
+
+```
+
+* **La hipótesis nula es: ** $$H_0: \mu \leq 168$$
+* **La hipótesis alternativa es:** $$H_A: \mu > 168$$
+
+### **b) Calculo de t: **
+
+```{r}
+# Datos
+mu=168
+s = 7.36
+x_bar=173.47
+n=15
+
+# Normalización
+t = (x_bar-mu)/(s/sqrt(n))
+
+# Confianza
+alfa = 0.05
+confianza = 1-alfa
+
+t_alfa = qt(alfa,df = n-1)
+
+t
+t_alfa
+
+```
+
+### **c) Grafica de lo obtenido y respuesta final:**
+
+```{r}
+# Grafico
+dnorm_limit <- function(x) {
+    y <- dnorm(x)
+    y[x < t_alfa  |  x > -t_alfa] <- NA
+    return(y)
+}
+
+# ggplot()
+grafico_densidad = ggplot(data.frame(x = c(-3, 3)), aes(x = x)) + 
+  stat_function(fun = dnorm_limit, geom = "area", fill = "blue", alpha = 0.2) +  stat_function(fun = dnorm) +
+  xlab("Tallas") + ylab("Densidad") + ggtitle("Función de densidad") + 
+  theme_bw() + geom_vline(xintercept = (x_bar-mu)/(s/sqrt(n)),cex=1.2,colour ="darkred") + 
+  geom_text(aes(x=(x_bar-mu)/(s/sqrt(n))+0.2, label="t", y=0.0), colour ="darkred",size=10)
+
+plot(grafico_densidad)
+
+```
+
+**Por lo tanto, como el valor de t obtenido esta fuera de la zona de aceptación, se rechaza la Hipótesis Nula y se acepta la Hipótesis Alternativa:**
+$$\mu > 168$$
+
+## **Parte III: Ejemplo de uso para la prueba chi para varianza con dos colas: **
+
+*"Un fabricante de baterías garantiza que su producto dura en promedio 2,5 años con una desviación estándar de 0,8 años. Si se toma una muestra aleatoria de 8 baterías y resultó que tiene una media muestral de 2,8 y una desviación estandar tipica muestral de 1,2, con la evidencia tomada ¿tiene razón el fabricante respecto a la desviación estándar poblacional? Utilice un nivel de significancia de 0,01."*
+
+### **a) Graficando la distribución de probabildad y declaración de hipótesis:**
+
+```{r}
+# Grafico
+grafico_densidad = ggplot(data = data.frame(x = c(0, 4)), aes(x)) +
+  stat_function(fun = dchisq, n = 8, args = list(x =0.64, df = 7)) + ylab("") +
+  scale_y_continuous(breaks = NULL) + xlab("Duración Bateria") + ylab("Densidad") + ggtitle("Función de densidad") + theme_bw() +
+  geom_vline(xintercept = 1.44,cex=1.2,colour ="darkred") + geom_text(aes(x=1.66, label="S^2", y=0.0), colour ="darkred",size=5) 
+
+grafico_densidad
+
+```
+
+* **La hipótesis nula es: ** $$H_0: \sigma^2 = 0,8$$
+* **La hipótesis alternativa es:** $$H_A: \sigma^2 \neq 0,8$$
+
+### **b) Calculo de chi y conclusión final: **
+
+```{r}
+# Datos
+sigma2=0.64
+n = 8
+s2=1.44
+
+
+# Normalización
+chi = (n-1)*s2/(sigma2) # Calculo de la prueba
+
+#Confianza
+alfa = 0.01 # Nivel de significancia
+confianza = 1-alfa
+
+chi_alfa = qchisq(confianza,df = n-1) # Calculo de chi considerando el nivel de significancia
+
+chi
+chi_alfa
+
+```
+
+**Como el valor de chi esta dentro del intervalo de confianza, se acepta la Hipótesis Nula. Es decir:**
+
+$$\sigma^2 = 0,8$$
+
+## **Parte IV: Ejemplo de bondad de ajuste Chi cuadrado, utilizando el conjunto de datos Iris**
+
+Imaginemos que recolectamos rosas y encontramos que 50
+eran de la especie setosa, 35 de la especie versicolor y 20 de la especie virginica. Suponga que un artículo científicoindica que en la región donde recopiló las rosas, la proporción de
+rosas setosa, versicolor y virginica es 3:2:1. ¿Hay alguna diferencia
+significativa entre las proporciones observadas y las proporciones
+esperadas?
+
+### **a) Definicion de la hipótesis y realización de tablas:**
+
+* **La hipótesis nula es: ** $$H_0: \chi_0^2 < \chi_k^2$$
+* **La hipótesis alternativa es:** $$H_0: \chi_0^2 > \chi_k^2$$
+
+```{r}
+data = data.frame(iris) # Se toma el dataframe iris
+
+# Tabla de frecuencia variables cualitativas
+# Frecuencia
+fi=c(50,35,20) # Frecuencia absoluta
+fac=cumsum(fi)                           # Frecuencia acumulada
+fri=as.numeric(fi/sum(fi))*100           # Frecuencia relativa
+frac=cumsum(fri)                         # Frecuencia relativa acumulada
+especie=c("SETOSA", "VERSICOLOR", "VIRGINICA")
+  # Tabla
+frecuencias_esp= data.frame(especie,fi,fac,fri=round(fri,2),frac=round(frac,2))
+  # Visualización
+knitr::kable(frecuencias_esp)
+
+```
+
+Si lo anterior esta en una relación de 3:2:1, eso implica que tenemos:
+
+```{r}
+data = data.frame(iris) # Se toma el dataframe iris
+
+# Tabla de frecuencia variables cualitativas
+# Frecuencia
+fi=c(52.5,35,17.5) # Frecuencia absoluta
+fac=cumsum(fi)                           # Frecuencia acumulada
+fri=as.numeric(fi/sum(fi))*100           # Frecuencia relativa
+frac=cumsum(fri)                         # Frecuencia relativa acumulada
+especie=c("SETOSA", "VERSICOLOR", "VIRGINICA")
+  # Tabla
+frecuencias_esp= data.frame(especie,fi,fac,fri=round(fri,2),frac=round(frac,2))
+  # Visualización
+knitr::kable(frecuencias_esp)
+
+```
+
+### **b) Calculo de chi y conclusión:**
+
+```{r}
+chi = ((50-52.5)/52.5) + ((35-35)/35) + ((20-17.5)/17.5) # Calculo de chi
+df = 2 # Grados de libertad
+chi_square = qchisq(0.05, df, lower.tail = F) # Calculo de chi con los grados de libertad
+
+chi
+chi_square
+
+```
+
+**Como el $$\chi_0^2$$ es menor al chi $$\chi_k^2$$ calculado a traves de los grados de libertad, la hipótesis nula no se rechaza. En otras palabras, las rosas no tienen diferencia de proporcion a la que se deberia encontrar, por lo que se tiene una proporción 3:2:1**
+
+$$\chi_0^2 < \chi_k^2$$
+
+## **Parte V: Ejemplo de prueba de hipótesis en una proporción binomial, de una cola.**
+
+*"En una muestra de 105 comercios seleccionados al azar de una zona,
+se observa que 27 de ellos han tenido pérdidas en este mes. Un analista
+económico de la zona establece que la proporción de comercios en la zona
+con pérdidas es igual o superior a 0.35. Contraste dicha hip´otesis a un nivel
+de significación del 5 %."*
+
+### **a) Declaración de hipótesis:**
+
+* **La hipótesis nula es: ** $$H_0: p \geq 0,35 $$
+* **La hipótesis alternativa es:** $$H_A: p < 0,35$$
+
+### **b) Calculo de z y conclusión:**
+
+```{r}
+# Datos para la prueba
+p_barra = 27/105
+p_sub_zero = 0.35
+n = 105
+
+z = (p_barra - p_sub_zero) / (sqrt((p_sub_zero*(1-p_sub_zero))/n)) # Calculo de z
+
+alfa = 0.05 # Nivel de significancia
+confianza = 1-alfa
+z_alfa = qnorm(alfa)
+
+z
+z_alfa
+
+```
+
+**Por lo tanto, se rechaza la Hipótesis Nula y se acepta la Hipótesis Alternativa**
+$$p < 0,35$$
+
+## **Parte VI: ejemplo de prueba de hipótesis en el que aplique la prueba del signo.**
+
+*"Hemos preguntado a 120 personas su opinión sobre el café de dos cafeterías: A y B, de la Ciudad de Buenos Aires. Se le solicita a las personas indicar cual de las dos cafeterias prefieren. De ellas, 50 prefierena la cafeteria A y los restante 70 prefieren a la cafeteria B. Considerando un nivel de significancia del 5% ¿se puede afirmar que ambos cafes son igualmente populares?"*
+
+### **a) Declaración de Hipótesis:**
+
+* **Hipótesis Nula: Ambos cafes son igual de populares**
+
+* **Hipótesis Alternativa: Un cafe es mas popular que otro**
+
+### **b) Calculo de la prueba de signo y conclusión:**
+
+```{r}
+binom.test(50,120) # Calculo de la prueba de signo
+
+```
+
+**Como el p-value de la prueba da 0.08241, siendo un valor mayor a 0.05, entonces estamos dentro del intervalo de confianza y por lo tanto, se acepta la Hipótesis Nula. Ambos cafes son igual de populares.**
+
+## **Parte VII: ejemplo de prueba de hipótesis para la prueba de Wilcoxon para una muestra.**
+
+Se tiene una muestra de peso de gatos. ¿La mediana del peso de estos gatos, difiere de 5 kg? Considere un nivel de significancia del 5%
+
+### **a) Tabla de la muestra y declaración de hipótesis**
+
+```{r}
+
+# Tabla de frecuencia variables cualitativas
+# Frecuencia
+Pesos =c(3.2, 2.4, 3.6, 3.5, 4.2, 4.9) # Frecuencia absoluta
+Gatos =c("Gato 1", "Gato 2", "Gato 3", "Gato 4", "Gato 5", "Gato 6")
+  # Tabla
+frecuencias_esp= data.frame(Gatos,Pesos)
+  # Visualización
+knitr::kable(frecuencias_esp)
+
+```
+
+* **Hipótesis Nula: La mediana de los gatos no difiere de 5 kg**
+
+* **Hipótesis Alternativa: La mediana de los gatos difiere de 5 kg**
+
+### **b) Calculo de la prueba de Wilcoxon y conclusión: **
+
+```{r}
+res <- wilcox.test(Pesos, mu = 5, conf.int = 0.95) # Calculo de la prueba
+
+res
+
+```
+
+**Con un nivel de signifancia del 5% se tiene que la mediana de los gatos difiere de 5kg. Por lo tanto, se rechaza la Hipótesis Nula y se acepta la Hipótesis Alternativa**
+
+## **Referencias**
+**[1]** Vargas, M. (2012). "Ejemplos Resueltos Tema 4". Guía de estudio Online. Recuperado de: https://www.ugr.es/~mvargas/Infe2.pdf
+
+**[2]** Universidad Nueva Granada. (Año desconocido). "Ejemplo de hipótesis para la varianza". Articulo online. Recuperado de: http://virtual.umng.edu.co/distancia/ecosistema/ovas/ingenieria_civil/probabilidad_y_estadistica/unidad_5/medios/documentacion/p12h8.php
+
+**[3]** UCI - Machine Learning Repository. (Año desconocido). "Iris Data Set". Repositorio online. Recuperado de: https://archive.ics.uci.edu/ml/datasets/iris
+
+**[4]** Dietrichson, A. (2019). "Métodos Cuantitativos". Libro Online. Recuperado de: https://bookdown.org/dietrichson/metodos-cuantitativos/prueba-de-signos.html
+
+**[5]** Amat, J. (2016). "Prueba de los rangos con signo de Wilcoxon". Documentación Online. Recuperado de: https://www.cienciadedatos.net/documentos/18_prueba_de_los_rangos_con_signo_de_wilcoxon
+
+**[6]** Villalobos, M. Giglio, J. Villanueva, M. (2022). "Estadística Aplicada". Material de clases. Recuperado de: https://uvirtual.usach.cl/moodle/
