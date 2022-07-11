@@ -5,6 +5,6 @@
 * [Nicolas Farfán](https://github.com/nic0q)
 * [John Serrano](https://github.com/PodssilDev)<br/>
 
-Para que el Markdown de la PEP pueda ser ejecutado correctamente, se requiere de un archivo .csv y un archivo .r especial disponible también en el repositorio:
+Para que el Markdown de la PEP pueda ser ejecutado correctamente, se requiere de un archivo .csv y un archivo .R especial disponible también en el repositorio:
 * [datos.csv](https://github.com/PodssilDev/Estadistica_Computacional_2022-1/blob/main/PEP1/datos.csv), el cual contiene los datos necesarios a cargar para resolver las preguntas.
-* [cargar_datos.r](https://github.com/PodssilDev/Estadistica_Computacional_2022-1/blob/main/PEP1/cargar_datos.r), el cual es un archivo de R que contiene una función para poder cargar el archivo datos.csv.
+* [cargar_datos.R](https://github.com/PodssilDev/Estadistica_Computacional_2022-1/blob/main/PEP1/cargar_datos.r), el cual es un archivo de R que contiene una función para poder cargar el archivo datos.csv.
