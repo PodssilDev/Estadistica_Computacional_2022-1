@@ -1,0 +1,223 @@
+---
+title: "**Ejercicios 07 - Estadística Computacional (13311)**"
+author: "**John Serrano C.**"
+date: "**`r Sys.Date()`**"
+output: rmdformats::readthedown
+---
+
+**Nota: Originalmente, habia realizado la entrega el 08/07, pero para hacer mi ejemplo mas original (y arreglar algunos erroes que habian) decidi volver a hacer la entrega.**
+
+## **Parte 1**
+
+### **Cree su propio ejemplo de regresión lineal simple utilizando un conjunto de datos con dos variables y la función lm. Grafique utilizando las funciones plot y abline.**
+
+Utilizando el dataset ***ChickWeight***, tenemos el tiempo y el peso de varios polluelos. ¿Existe alguna relación directa entre estas variables?
+
+```{r}
+library("ggplot2")
+# Dataset a utilizar
+datos = datasets::ChickWeight 
+# Graficamos los datos a utilizar
+plot(weight~Time, datos)
+```
+
+Comenzando con el procedimiento de la regresión lineal simple:
+
+```{r}
+mod = lm(weight~Time, datos)
+plot(weight~Time, datos)
+title("Tiempo y tamaño de polluelos nacidos hace días")
+abline(mod)
+```
+
+Si queremos saber mas información sobre el modelo construido, aplicamos la función **summary**:
+
+```{r}
+summary(mod)
+```
+
+Por lo tanto, el modelo que se ajusta a los datos es:
+
+$$ y = mx + c $$
+$$ y = 8,8030m + 27,4674$$
+
+También podemos obtener el **coeficiente de determinación**:
+
+```{r}
+print(summary(mod)$r.squared)
+```
+
+Si observamos los p-values, tanto el del tiempo como el del intercepto son muy bajos, menores a 0,05. Por lo tanto:
+
+* **Se rechaza la hipótesis Nula de que el intercepto de la recta es 0 y se acepta la Hipótesis Alternativa de que el intercepto si es representativo y distinto de 0.**
+
+* **Se rechaza la hipótesis Nula de que la pendiente de la recta es 0 y se acepta la Hipótesis Alternativa de que la pendiente si es representativa y distinta de 0.**
+
+Finalmente, podemos generar una **zona de confianza** para ver que puntos estan representados por el modelo generado.
+
+```{r}
+confianza = confint(mod, level = 0.95)
+print(confianza)
+```
+
+```{r}
+grafico = ggplot(datos,aes(x=Time, y=weight, label= "")) +
+  geom_point(aes(Time,weight),datos,color = "green")+
+  theme_bw() + ylab("Peso de polluelos")+
+  xlab("Tiempo desde el nacimiento de los polluelos (en días)") + ggtitle("Tiempo VS Peso de polluelos nacidos hace días") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_text(check_overlap = TRUE) +
+  geom_line(aes(Time,weight),datos,color="blue",cex=0.1) +
+  geom_smooth(method ="lm", formula = y ~ x,level=0.95)
+plot(grafico)
+```
+
+De lo anterior, **podemos concluir** que utilizando un nivel de confianza del 95% si existe una relación directa entre el tiempo y el tamaño de los polluelos. Sin embargo, **el modelo propuesto no es el adecuado** para todos los puntos de datos ya que el coeficiente de determinación es **0,70** y no tan cercanos a 0,99, lo cual es el ideal para decir que una recta se ajusta perfectamente a los datos estudiados. Además, con las zonas de confianza claramente se puede observar que quedan muchos puntos quedan fuera de la zona.
+
+## **Parte 2**
+
+### **Utilice el modelo de regresión lineal simple de la actividad 1 para predecir 5 nuevos registros e incorpórelos a su conjunto de datos. Calcule nuevamente la regresión lineal simple ¿Se observa algún cambio en los coeficientes?**
+
+```{r}
+df = data.frame(Time = datos$Time, weight = datos$weight)
+Time = c(10, 12, 14, 16, 20)
+predict.lm(mod, data.frame(Time = Time))
+weight = c(115.4978, 133.1039, 150.7100, 168.3161, 203.5282)
+datos_2 = data.frame(Time = Time, weight = weight)
+datos_2 = rbind(df,datos_2)
+
+Time = datos_2$Time
+weight = datos_2$weight
+```
+
+Ahora, volvemos a realizar toda la regresión lineal simple:
+
+```{r}
+mod = lm(weight ~ Time, datos_2)
+plot(Time, weight)
+title("Tiempo VS Peso de polluelos nacidos hace días")
+abline(mod)
+```
+
+Si queremos saber mas información sobre el modelo construido, aplicamos la función **summary**:
+
+```{r}
+summary(mod)
+```
+
+Por lo tanto, el modelo que se ajusta a los datos es:
+
+$$ y = 8,8030m + 27,4674$$
+
+También podemos obtener el **coeficiente de determinación**:
+
+```{r}
+print(summary(mod)$r.squared)
+```
+
+Si observamos los p-values, tanto el del tiempo como el del intercepto son muy bajos, menores a 0,05. Por lo tanto:
+
+* **Se rechaza la hipótesis Nula de que el intercepto de la recta es 0 y se acepta la Hipótesis Alternativa de que el intercepto si es representativo y distinto de 0.**
+
+* **Se rechaza la hipótesis Nula de que la pendiente de la recta es 0 y se acepta la Hipótesis Alternativa de que la pendiente si es representativa y distinta de 0.**
+
+Finalmente, podemos generar una **zona de confianza** para ver que puntos estan representados por el modelo generado.
+
+```{r}
+confianza = confint(mod, level = 0.95)
+print(confianza)
+```
+
+```{r}
+grafico = ggplot(datos_2,aes(x=Time, y=weight, label= "")) +
+  geom_point(aes(Time,weight),datos,color = "green")+
+  theme_bw() + ylab("Peso de polluelos")+
+  xlab("Tiempo desde el nacimiento de los polluelos (en días)") + ggtitle("Tiempo VS Peso de polluelos nacidos hace días") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_text(check_overlap = TRUE) +
+  geom_line(aes(Time,weight),datos_2,color="blue",cex=0.1) +
+  geom_smooth(method ="lm", formula = y ~ x,level=0.95)
+plot(grafico)
+```
+
+De lo anterior, **podemos concluir** que utilizando un nivel de confianza del 95% si existe una relación directa entre el tiempo y el tamaño de los polluelos. Sin embargo, **el modelo propuesto no es el adecuado** para todos los puntos de datos ya que el coeficiente de determinación es **0,70** y no tan cercanos a 0,99, lo cual es el ideal para decir que una recta se ajusta perfectamente a los datos estudiados. Además, con las zonas de confianza claramente se puede observar que quedan muchos puntos quedan fuera de la zona.
+
+**Solamente en el coeficiente de determinación se puede observar un cambio, aún asi minimo. Antes, el valor del coeficiente era 0.7007393, ahora es 0.7017417, por lo que los nuevos datos provocaron una diferencia de 0,0010024 entre coeficientes. No se observa ningún cambio en los demas coeficientes, por lo que se podria decir que la predicción de los valores fue muy correcta, a tal punto que casi no provocó un cambio significativo ni en el gráfico ni en los coeficientes.**
+
+## **Parte 3**
+
+### **Tome un punto cualquiera de su conjunto de datos y multiplíquelo por 100, calcule nuevamente la regresión lineal simple ¿Se observa algún cambio en los coeficientes?**
+
+```{r}
+df_2 = data.frame(Time = 2 * 100, weight = 48 * 100)
+datos_3 = rbind(df, df_2)
+
+Time = datos_3$Time
+weight = datos_3$weight
+```
+
+Ahora, volvemos a realizar toda la regresión lineal simple.
+
+```{r}
+mod = lm(weight ~ Time, datos_3)
+plot(Time, weight)
+title("Tiempo VS Peso de polluelos nacidos hace días")
+abline(mod)
+```
+
+Si queremos saber mas información sobre el modelo construido, aplicamos la función **summary**:
+
+```{r}
+summary(mod)
+```
+
+Por lo tanto, el modelo que se ajusta a los datos es:
+
+$$ y = 17,9645m - 68,5183$$
+
+También podemos obtener el **coeficiente de determinación**:
+
+```{r}
+print(summary(mod)$r.squared)
+```
+
+Si observamos los p-values, tanto el del tiempo como el del intercepto **siguen** siendo muy bajos, menores a 0,05. Por lo tanto:
+
+* **Se rechaza la hipótesis Nula de que el intercepto de la recta es 0 y se acepta la Hipótesis Alternativa de que el intercepto si es representativo y distinto de 0.**
+
+* **Se rechaza la hipótesis Nula de que la pendiente de la recta es 0 y se acepta la Hipótesis Alternativa de que la pendiente si es representativa y distinta de 0.**
+
+Finalmente, podemos generar una **zona de confianza** para ver que puntos estan representados por el modelo generado.
+
+```{r}
+confianza = confint(mod, level = 0.95)
+print(confianza)
+```
+
+```{r}
+grafico = ggplot(datos_3,aes(x=Time, y=weight, label= "")) +
+  geom_point(aes(Time,weight),datos,color = "green")+
+  theme_bw() + ylab("Peso de polluelos")+
+  xlab("Tiempo desde el nacimiento de los polluelos (en días)") + ggtitle("Tiempo VS Peso de polluelos nacidos hace días") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_text(check_overlap = TRUE) +
+  geom_line(aes(Time,weight),datos_3,color="blue",cex=0.1) +
+  geom_smooth(method ="lm", formula = y ~ x,level=0.95)
+plot(grafico)
+```
+
+De lo anterior, **podemos concluir** que utilizando un nivel de confianza del 95% **todavia** existe una relación directa entre el tiempo y el tamaño de los polluelos. Sin embargo, **el modelo propuesto no es el adecuado** para todos los puntos de datos, aunque si es mejor que el modelo propuesto anteriormente en las partes 1 y 2,  ya que el coeficiente de determinación es **0,81** y a pesar de que es mucho mejor que el coeficiente anterior, todavia no es cercano a 0,99, lo cual es el ideal para decir que una recta se ajusta perfectamente a los datos estudiados. Además, con las zonas de confianza claramente se puede observar que quedan muchos puntos quedan fuera de la zona, lo cual se puede apreciar aún mas considerando que hay un punto que es mucho mayor que todos los otros.
+
+**Se observan varios cambios en los coeficientes, principalmente:**
+
+* **El coeficiente de estimación de la pendiente cambió de 8.8030 a 17.9645, por lo que se tiene una diferencia de 9,1615.**
+
+* **El coeficiente de estimación del intercepto cambió de 27.4674 a -68.5183, por lo que se tiene una diferencia de -95,9857.**
+
+* **El coeficiente de determinación cambió de 0,70 a 0,81, por lo que se tiene una diferencia de 0,11.**
+
+## **Referencias**
+
+* Carollo, M. (2011). "REGRESIÓN LINEAL SIMPLE". Documento Online. Recuperado de: http://eio.usc.es/eipc1/BASE/BASEMASTER/FORMULARIOS-PHP-DPTO/MATERIALES/Mat_50140116_Regr_%20simple_2011_12.pdf 
+
+* Autor Desconocido. (Año Desconocido). "Weight versus age of chicks on different diets". Documentación online. Recuperado de: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ChickWeight.html
